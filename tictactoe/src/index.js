@@ -16,6 +16,7 @@ class Board extends React.Component {
 
     renderSquare(i) {
         return <Square
+            key={i}
             value={this.props.squares[i]}
             onClick={() => this.props.onClick(i)}
         />;
@@ -25,21 +26,17 @@ class Board extends React.Component {
         return (
             <div>
                 <div className="status">{this.props.status}</div>
-                <div className="board-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(6)}
-                    {this.renderSquare(7)}
-                    {this.renderSquare(8)}
-                </div>
+                {
+                    [0, 1, 2].map((row) => {
+                        return <div key={row} className="board-row">
+                            {
+                                [0, 1, 2].map((col) => {
+                                    return this.renderSquare(row*3 + col);
+                                })
+                            }
+                        </div>
+                    })
+                }
             </div>
         );
     }
@@ -94,8 +91,8 @@ class Game extends React.Component {
         for (var i = 0; i < current.squares.length; i++) {
             if (current.squares[i] !== prev.squares[i]) {
                 const col = (i % 3) + 1;
-                const row = parseInt(i/3) + 1;
-                return `(${col}, ${row})`; 
+                const row = parseInt(i / 3) + 1;
+                return `(${col}, ${row})`;
             }
         }
         return null;
@@ -115,7 +112,7 @@ class Game extends React.Component {
             const desc = move ?
                 `Go to move ${movePosn}` :
                 'Go to game start';
-                    return (
+            return (
                 <li key={move}>
                     <button style={move === this.state.stepNumber ? styleSelectedMove : null} onClick={() => this.jumpTo(move)}>{desc}</button>
                 </li>
