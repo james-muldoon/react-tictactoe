@@ -57,7 +57,8 @@ class Game extends React.Component {
                 squares: Array(9).fill(null)
             }],
             stepNumber: 0,
-            xIsNext: true
+            xIsNext: true,
+            sortAsc: true
         };
     }
 
@@ -107,27 +108,37 @@ class Game extends React.Component {
         return null;
     }
 
+    toggleAsc() {
+        this.setState({
+            sortAsc: !this.state.sortAsc
+        })
+    }
+
     render() {
+        // const history = (this.state.sortAsc) ? this.state.history : this.state.history.slice().reverse();
         const history = this.state.history;
-        const current = history[this.state.stepNumber];
-        const winner = calculateWinner(current.squares.slice());
+        const stepNumber = (this.state.sortAsc) ? this.state.stepNumber : history.length - this.state.stepNumber - 1;
+        const current = this.state.history.slice()[stepNumber];
 
         const moveStyle = {
             fontWeight: 'bold'
         }
 
         const moves = history.map((step, move) => {
-            const movePosn = this.getChangedCell(move);
-            const desc = move ?
+            const currMove = (this.state.sortAsc) ? move : history.length - move - 1;
+            const movePosn = this.getChangedCell(currMove);
+            const desc = currMove ?
                 `Go to move ${movePosn}` :
+                // `Go to move ${move}` :
                 'Go to game start';
             return (
-                <li key={move}>
-                    <button style={move === this.state.stepNumber ? moveStyle : null} onClick={() => this.jumpTo(move)}>{desc}</button>
+                <li key={currMove}>
+                    <button style={currMove === stepNumber ? moveStyle : null} onClick={() => this.jumpTo(move)}>{desc}</button>
                 </li>
             );
         });
 
+        const winner = calculateWinner(current.squares.slice());
         let status;
         if (winner) {
             status = 'Winner: ' + current.squares[winner[0]];
@@ -151,6 +162,11 @@ class Game extends React.Component {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
+                    <button
+                        onClick={() => this.toggleAsc()}
+                    >
+                    {this.state.sortAsc ? 'Ascending' : 'Descending'}
+                    </button>
                     <ol>{moves}</ol>
                 </div>
             </div>
